@@ -1,22 +1,88 @@
-.App {
-  text-align: center;
+.app {
+  height: 100vh;
+  display: flex;
+  padding: 40px;
+  justify-content: space-between;
 }
 
-.App-logo {
-  height: 40vmin;
+.cool-shadow,
+.cool-shadow-selected {
+  border-radius: 8px;
+  padding: 1em;
+  border: 2px solid 
+  animation: grow 600ms ease-in-out 600ms forwards, rise 600ms ease-in-out 1.2s forwards;
+  transition: background-color 300ms ease-in-out;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.cool-shadow-selected {
+  /* background-color: orangered; */
+  animation: rise 600ms ease-in-out 600ms infinite alternate;
+}
+
+@keyframes grow {
+  from {
+    transform: scale(0.6);
+    opacity: 0.2;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes rise {
+  from {
+    box-shadow: 0px 0px 0px 
+  }
+  to {
+    box-shadow: 8px 8px 20px 
+  }
+}
+
+.camera {
+  flex: 0 0 33%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  justify-content: space-between;
 }
 
-.App-link {
-  color: #09d3ac;
+.camera-box {
+  flex-basis: 40%;
+  display: flex;
+  flex-direction: column;
+}
+
+.text-box {
+  flex-basis: 50%;
+}
+
+.layout {
+  flex: 0 0 63%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.letter-row {
+  min-width: 75%;
+  padding: 1em;
+  display: flex;
+  justify-content: space-evenly;
+  /* align-self: flex-start; */
+}
+
+.letter {
+  font-size: 2em;
+  padding: 0.5em;
+}
+
+.tic {
+  border-radius: 8px;
+  width: 2em;
+  height: 2em;
+  background: red;
+  padding: 0.5em;
+  z-index: -1;
 }

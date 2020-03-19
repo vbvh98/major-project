@@ -1,34 +1,58 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import Webcam from 'react-webcam'
+import { DEFAULT_BLINK_LAYOUT } from './blink-layout.json'
 import './App.css'
 
-const electron = window.require('electron')
-const { ipcRenderer } = electron
+// const deepCopy = inObject => {
+//   let outObject, value, key
+
+//   if (typeof inObject !== 'object' || inObject === null) {
+//     return inObject // Return the value if inObject is not an object
+//   }
+
+//   // Create an array or object to hold the values
+//   outObject = Array.isArray(inObject) ? [] : {}
+
+//   for (key in inObject) {
+//     value = inObject[key]
+
+//     // Recursively (deep) copy for nested objects, including arrays
+//     outObject[key] = typeof value === 'object' && value !== null ? deepCopy(value) : value
+//   }
+
+//   return outObject
+// }
+
+// const indexMap = [7, 6, 7, 6, 2]
 
 const App = () => {
-  const [data, setData] = React.useState({ message: 'Loading' })
-
-  React.useEffect(() => {
-    // setting up an event listener to read data that background process
-    // will send via the main process after processing the data we
-    // send from visiable renderer process
-    ipcRenderer.on('MESSAGE_FROM_BACKGROUND_VIA_MAIN', (event, args) => {
-      setData(args)
-    })
-
-    // trigger event to start background process
-    // can be triggered pretty much from anywhere after
-    // you have set up a listener to get the information
-    // back from background process, as I have done in line 13
-  }, [])
-
-  const startBlinkDetection = () => {
-    ipcRenderer.send('START_BACKGROUND_VIA_MAIN')
-  }
+  const [layout, setLayout] = useState(DEFAULT_BLINK_LAYOUT)
+  // const [rowIdx, setRowIdx] = useState(2)
+  // const [letterIdx, setLetterIdx] = useState(3)
 
   return (
-    <div className='App'>
-      HELLO {JSON.stringify(data)}
-      <button onClick={startBlinkDetection}>Start Detection</button>
+    <div className='app'>
+      <div className='camera'>
+        <div className='camera-box cool-shadow'>
+          <Webcam height='240px' />
+        </div>
+        <div className='text-box cool-shadow'>typed-text</div>
+      </div>
+      <div className='layout cool-shadow'>
+        {layout.map(({ letterGroup, selection }) => {
+          return (
+            <div className={selection ? 'letter-row  cool-shadow-selected' : 'letter-row '}>
+              {letterGroup.map(({ letter, selection }) => {
+                return (
+                  <div className={selection ? 'letter cool-shadow-selected' : 'letter'}>
+                    {letter}
+                  </div>
+                )
+              })}
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }

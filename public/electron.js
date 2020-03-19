@@ -19,6 +19,7 @@ function createWindow() {
         slashes: true
       })
   mainWindow = new BrowserWindow({
+    fullscreen: true,
     webPreferences: {
       nodeIntegration: true
     }
