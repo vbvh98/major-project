@@ -1,59 +1,9 @@
 {
   "DEFAULT_BLINK_LAYOUT": [
-    {
-      "letterGroup": [
-        { "letter": "A", "selection": false },
-        { "letter": "B", "selection": false },
-        { "letter": "C", "selection": false },
-        { "letter": "D", "selection": false },
-        { "letter": "E", "selection": false },
-        { "letter": "F", "selection": false },
-        { "letter": "G", "selection": false }
-      ],
-      "selection": true
-    },
-
-    {
-      "letterGroup": [
-        { "letter": "H", "selection": false },
-        { "letter": "I", "selection": false },
-        { "letter": "J", "selection": false },
-        { "letter": "K", "selection": false },
-        { "letter": "L", "selection": true },
-        { "letter": "M", "selection": false }
-      ],
-      "selection": false
-    },
-
-    {
-      "letterGroup": [
-        { "letter": "N", "selection": false },
-        { "letter": "O", "selection": false },
-        { "letter": "P", "selection": false },
-        { "letter": "Q", "selection": false },
-        { "letter": "R", "selection": false },
-        { "letter": "S", "selection": false },
-        { "letter": "T", "selection": false }
-      ],
-      "selection": false
-    },
-    {
-      "letterGroup": [
-        { "letter": "U", "selection": false },
-        { "letter": "V", "selection": false },
-        { "letter": "W", "selection": false },
-        { "letter": "X", "selection": false },
-        { "letter": "Y", "selection": false },
-        { "letter": "Z", "selection": false }
-      ],
-      "selection": false
-    },
-    {
-      "letterGroup": [
-        { "letter": "SAPCE", "selection": false },
-        { "letter": "BACKSAPCE", "selection": false }
-      ],
-      "selection": false
-    }
+    ["A", "B", "C", "D", "E", "F", "G"],
+    ["H", "I", "J", "K", "L", "M"],
+    ["N", "O", "P", "Q", "R", "S", "T"],
+    ["U", "V", "W", "X", "Y", "Z"],
+    ["Space", "Action"]
   ]
 }
