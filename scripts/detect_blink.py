@@ -55,7 +55,7 @@ def start_detector():
     EYE_AR_THRESH = 0.25
     EYE_AR_CONSEC_FRAMES_S = 9
     EYE_AR_CONSEC_FRAMES_M = 18
-    EYE_AR_CONSEC_FRAMES_L = 27
+    EYE_AR_CONSEC_FRAMES_L = 25
 
     COUNTER = 0
 

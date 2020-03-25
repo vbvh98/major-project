@@ -57,7 +57,7 @@ let cache = {
 
 // a window object outside the function scope prevents
 // the object from being garbage collected
-let hiddenWindow
+let hiddenWindow = null
 
 ipcMain.on('STOP_HIDDEN', () => {
   hiddenWindow.close()
@@ -67,12 +67,14 @@ ipcMain.on('STOP_HIDDEN', () => {
 // This event listener will listen for request
 // from visible renderer process
 ipcMain.on('START_BACKGROUND_VIA_MAIN', (event, args) => {
+  if (hiddenWindow !== null) return
   const backgroundFileUrl = url.format({
     pathname: path.join(__dirname, `../background_tasks/background.html`),
     protocol: 'file:',
     slashes: true
   })
   hiddenWindow = new BrowserWindow({
+    show: false,
     webPreferences: {
       nodeIntegration: true
     }

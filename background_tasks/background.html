@@ -18,10 +18,6 @@
       ipcRenderer.send('MESSAGE_FROM_BACKGROUND', { message: results })
     })
 
-    pyshell.on('stderr', function(stderr) {
-      // handle stderr (a line of text from stderr)
-      ipcRenderer.send('MESSAGE_FROM_BACKGROUND', { message: stderr })
-    })
     pyshell.on('close', () => {
       ipcRenderer.send('STOP_HIDDEN')
     })
