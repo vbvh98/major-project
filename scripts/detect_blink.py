@@ -1,16 +1,16 @@
-from scipy.spatial import distance as dist
-from imutils.video import FileVideoStream
-from imutils.video import VideoStream
-from imutils import face_utils
-from datetime import datetime
-import numpy as np
-import imutils
-import time
-import dlib
 import json
-import cv2
-import sys
 import os
+import sys
+import time
+from datetime import datetime
+
+import cv2
+import dlib
+import imutils
+import numpy as np
+from imutils import face_utils
+from imutils.video import FileVideoStream, VideoStream
+from scipy.spatial import distance as dist
 
 
 def current_milli_time(): return int(round(time.time() * 1000))
@@ -50,12 +50,12 @@ def start_detector():
     global blinked_s
     global blinked_m
     global blinkstart
-    log('Detector started')
+    # log('Detector started')
 
     EYE_AR_THRESH = 0.25
     EYE_AR_CONSEC_FRAMES_S = 9
     EYE_AR_CONSEC_FRAMES_M = 18
-    EYE_AR_CONSEC_FRAMES_L = 25
+    EYE_AR_CONSEC_FRAMES_L = 30
 
     COUNTER = 0
 
@@ -70,7 +70,7 @@ def start_detector():
     log(json.dumps({"type": "INFO", "msg": "Starting Video"}))
 
     fileStream = True
-    vs = VideoStream(src=0).start()
+    vs = cv2.VideoCapture(-1)
 
     fileStream = False
     time.sleep(1.0)
@@ -81,10 +81,10 @@ def start_detector():
         if fileStream and not vs.more():
             break
 
-        frame = vs.read()
+        _, frame = vs.read()
 
         frame = cv2.flip(frame, 1)
-        frame = imutils.resize(frame, width=450)
+        frame = cv2.resize(frame, (450, frame.shape[0]), interpolation = cv2.INTER_AREA)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         rects = detector(gray, 0)
@@ -100,6 +100,11 @@ def start_detector():
             rightEAR = eye_aspect_ratio(rightEye)
 
             ear = (leftEAR + rightEAR) / 2.0
+
+            # leftEyeHull = cv2.convexHull(leftEye)
+            # rightEyeHull = cv2.convexHull(rightEye)
+            # cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
+            # cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
 
             if not blinked and ear < EYE_AR_THRESH:
                 COUNTER += 1
@@ -131,6 +136,20 @@ def start_detector():
             else:
                 blinkstart, blinked, blinked_m, blinked_s = False, False, False, False
                 COUNTER = 0
+            # cv2.putText(frame, "Blinks: {}".format('ad'), (10, 30),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            # cv2.putText(frame, "EAR: {:.2f}".format(ear), (300, 30),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+    #     cv2.imshow("Frame", frame)
+    #     key = cv2.waitKey(1) & 0xFF
+
+    #     # if the `q` key was pressed, break from the loop
+    #     if key == ord("q"):
+    #         break
+
+    # # do a bit of cleanup
+    # cv2.destroyAllWindows()
 
     vs.stop()
 
