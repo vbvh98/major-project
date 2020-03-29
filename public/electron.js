@@ -74,7 +74,7 @@ ipcMain.on('START_BACKGROUND_VIA_MAIN', (event, args) => {
     slashes: true
   })
   hiddenWindow = new BrowserWindow({
-    show: true,
+    show: false,
     webPreferences: {
       nodeIntegration: true
     }

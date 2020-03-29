@@ -12,14 +12,16 @@
 
     let pyshell = new PythonShell('detect_blink.py', options)
 
+    //ipcRenderer.send('MESSAGE_FROM_BACKGROUND', { message: pyshell })
+
     pyshell.on('message', function(results) {
       ipcRenderer.send('MESSAGE_FROM_BACKGROUND', { message: results })
     })
 
-    pyshell.on('stderr', x => {
-      ipcRenderer.send('MESSAGE_FROM_BACKGROUND', { message: x })
+    pyshell.on('stderr', function(stderr) {
+      // handle stderr (a line of text from stderr)
+      ipcRenderer.send('MESSAGE_FROM_BACKGROUND', { message: stderr })
     })
-
     pyshell.on('close', () => {
       ipcRenderer.send('STOP_HIDDEN')
     })

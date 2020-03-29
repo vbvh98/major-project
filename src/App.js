@@ -1,55 +1,43 @@
+import React, { useState, useEffect } from 'react'
 import Webcam from 'react-webcam'
-import React, { useState, useReducer, useCallback } from 'react'
-import AlphabetLayout from './components/AlphabetLayout'
-import Modal from './components/Modal'
-import { useBlinkDetector } from './hooks/useBlinkDetector'
+import { DEFAULT_BLINK_LAYOUT } from './blink-layout.json'
+import useBlinkDetector from './DetectBlink'
+import './App.css'
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'APP':
-      return { text: state.text + action.payload }
-    case 'SPACE':
-      return { text: state.text + ' ' }
-    case 'DEL':
-      return { text: state.text.substring(0, state.text.length - 1) }
-    default:
-      return state
-  }
-}
+const indexMap = [7, 6, 7, 6, 2]
 
 const App = () => {
-  const [state, disptach] = useReducer(reducer, { text: '' })
-  const [display, setDisplay] = useState(false)
-  const data = useBlinkDetector()
+  const [layout, setLayout] = useState(DEFAULT_BLINK_LAYOUT)
+  // const [rowIdx, setRowIdx] = useState(2)
+  // const [letterIdx, setLetterIdx] = useState(3)
+  const [data, startDetection, stopBlinkDetection] = useBlinkDetector()
 
-  const updateDisplayModal = useCallback(
-    val => {
-      setDisplay(val)
-    },
-    [setDisplay]
-  )
+  useEffect(() => {
+    startDetection()
+    return () => stopBlinkDetection()
+  }, [])
 
-  const updateText = useCallback(
-    (type, payload) => {
-      disptach({ type, payload })
-    },
-    [disptach]
-  )
+  useEffect(() => {
+    console.table(data)
+  }, [data])
 
   return (
     <div className='app'>
       <div className='camera'>
         <div className='camera-box cool-shadow'>
-          <Webcam height='240px' />
+          {/* <Webcam height='240px' /> */}
         </div>
-        <div className='text-box cool-shadow'>{state.text}</div>
+        <div className='text-box cool-shadow'>{JSON.stringify(data)}</div>
       </div>
-      <AlphabetLayout
-        data={data}
-        updateText={updateText}
-        updateDisplayModal={updateDisplayModal}
-      />
-      <Modal data={data} display={display} />
+      <div className='layout cool-shadow'>
+        {layout.map(row => (
+          <div className='letter-row'>
+            {row.map(cell => (
+              <div className='letter'>{cell}</div>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
