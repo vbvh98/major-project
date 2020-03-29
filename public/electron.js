@@ -61,7 +61,6 @@ let hiddenWindow = null
 
 ipcMain.on('STOP_HIDDEN', () => {
   hiddenWindow.close()
-  console.log('closed')
 })
 
 // This event listener will listen for request

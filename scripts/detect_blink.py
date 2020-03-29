@@ -13,9 +13,6 @@ import sys
 import os
 
 
-def current_milli_time(): return int(round(time.time() * 1000))
-
-
 def log(message):
     print(message)
     sys.stdout.flush()
@@ -23,14 +20,6 @@ def log(message):
 
 def beep():
     os.system('mpg123 -q ./scripts/beep-07.mp3')
-
-
-blinked = True
-blinked_s = True
-blinked_m = True
-
-
-blinkstart = True
 
 
 def eye_aspect_ratio(eye):
@@ -45,94 +34,107 @@ def eye_aspect_ratio(eye):
     return ear
 
 
-def start_detector():
-    global blinked
-    global blinked_s
-    global blinked_m
-    global blinkstart
-    log('Detector started')
+blinked = True
+blinked_s = True
+blinked_m = True
 
-    EYE_AR_THRESH = 0.25
-    EYE_AR_CONSEC_FRAMES_S = 9
-    EYE_AR_CONSEC_FRAMES_M = 18
-    EYE_AR_CONSEC_FRAMES_L = 25
+blinkstart = True
 
-    COUNTER = 0
+EYE_AR_THRESH = 0.28
+EYE_AR_CONSEC_FRAMES_S = 10
+EYE_AR_CONSEC_FRAMES_M = 20
+EYE_AR_CONSEC_FRAMES_L = 30
 
-    log(json.dumps({"type": "INFO", "msg": "Loading LandMark Resource"}))
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor(
-        "./scripts/shape_predictor_68_face_landmarks.dat")
+COUNTER = 0
 
-    (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
-    (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
+log(json.dumps({"type": "INFO", "msg": "Loading LandMark Resource"}))
+detector = dlib.get_frontal_face_detector()
+predictor = dlib.shape_predictor(
+    "./scripts/shape_predictor_68_face_landmarks.dat")
 
-    log(json.dumps({"type": "INFO", "msg": "Starting Video"}))
+(lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
+(rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-    fileStream = True
-    vs = VideoStream(src=0).start()
+log(json.dumps({"type": "INFO", "msg": "Starting Video"}))
 
-    fileStream = False
-    time.sleep(1.0)
-    start = datetime.now()
+fileStream = True
+vs = VideoStream(src=0).start()
 
-    while True:
-        time.sleep(0.04)
-        if fileStream and not vs.more():
-            break
+fileStream = False
+time.sleep(1.0)
+start = datetime.now()
 
-        frame = vs.read()
+while True:
+    time.sleep(0.04)
+    if fileStream and not vs.more():
+        break
 
-        frame = cv2.flip(frame, 1)
-        frame = imutils.resize(frame, width=450)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    frame = vs.read()
 
-        rects = detector(gray, 0)
+    frame = cv2.flip(frame, 1)
+    frame = imutils.resize(frame, width=450)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        for rect in rects:
+    rects = detector(gray, 0)
 
-            shape = predictor(gray, rect)
-            shape = face_utils.shape_to_np(shape)
+    for rect in rects:
 
-            leftEye = shape[lStart:lEnd]
-            rightEye = shape[rStart:rEnd]
-            leftEAR = eye_aspect_ratio(leftEye)
-            rightEAR = eye_aspect_ratio(rightEye)
+        shape = predictor(gray, rect)
+        shape = face_utils.shape_to_np(shape)
 
-            ear = (leftEAR + rightEAR) / 2.0
+        leftEye = shape[lStart:lEnd]
+        rightEye = shape[rStart:rEnd]
+        leftEAR = eye_aspect_ratio(leftEye)
+        rightEAR = eye_aspect_ratio(rightEye)
 
-            if not blinked and ear < EYE_AR_THRESH:
-                COUNTER += 1
-                if COUNTER == 1:
-                    start = datetime.now()
-                if COUNTER == 2:
-                    blinkstart = True
-                else:
-                    blinkstart = False
-                if COUNTER >= EYE_AR_CONSEC_FRAMES_L:
-                    blinked = True
-                    beep()
-                    e = datetime.now() - start
-                    # log(f'{e.seconds}:{e.microseconds}')
-                    log(json.dumps({"type": "BLINK", "msg": "L"}))
-                elif not blinked_m and COUNTER >= EYE_AR_CONSEC_FRAMES_M:
-                    blinked_m = True
-                    beep()
-                    e = datetime.now() - start
-                    # log(f'{e.seconds}:{e.microseconds}')
-                    log(json.dumps({"type": "BLINK", "msg": "M"}))
-                elif not blinked_s and COUNTER >= EYE_AR_CONSEC_FRAMES_S:
-                    blinked_s = True
-                    beep()
-                    e = datetime.now() - start
-                    # log(f'{e.seconds}:{e.microseconds}')
-                    log(json.dumps({"type": "BLINK", "msg": "S"}))
+        ear = (leftEAR + rightEAR) / 2.0
 
+        leftEyeHull = cv2.convexHull(leftEye)
+        rightEyeHull = cv2.convexHull(rightEye)
+        cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
+        cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
+
+        if not blinked and ear < EYE_AR_THRESH:
+            COUNTER += 1
+            if COUNTER == 1:
+                start = datetime.now()
+            if COUNTER == 2:
+                blinkstart = True
             else:
-                blinkstart, blinked, blinked_m, blinked_s = False, False, False, False
-                COUNTER = 0
+                blinkstart = False
+            if COUNTER >= EYE_AR_CONSEC_FRAMES_L:
+                blinked = True
+                beep()
+                e = datetime.now() - start
+                # log(f'{e.seconds}:{e.microseconds}')
+                log(json.dumps({"type": "BLINK", "msg": "L"}))
+            elif not blinked_m and COUNTER >= EYE_AR_CONSEC_FRAMES_M:
+                blinked_m = True
+                beep()
+                e = datetime.now() - start
+                # log(f'{e.seconds}:{e.microseconds}')
+                log(json.dumps({"type": "BLINK", "msg": "M"}))
+            elif not blinked_s and COUNTER >= EYE_AR_CONSEC_FRAMES_S:
+                blinked_s = True
+                beep()
+                e = datetime.now() - start
+                # log(f'{e.seconds}:{e.microseconds}')
+                log(json.dumps({"type": "BLINK", "msg": "S"}))
 
-    vs.stop()
+        else:
+            blinkstart, blinked, blinked_m, blinked_s = False, False, False, False
+            COUNTER = 0
+        cv2.putText(frame, "Blinks: {}".format('ad'), (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        cv2.putText(frame, "EAR: {:.2f}".format(ear), (300, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
+    cv2.imshow("Frame", frame)
+    key = cv2.waitKey(1) & 0xFF
 
-start_detector()
+    if key == ord("q"):
+        break
+
+cv2.destroyAllWindows()
+
+vs.stop()

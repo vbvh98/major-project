@@ -1,27 +1,31 @@
-<script>
-  const { PythonShell } = require('python-shell')
-  const { ipcRenderer } = require('electron')
-  const path = require('path')
+<!DOCTYPE html>
+<html lang="en">
+  <head> </head>
+  <body>
+    <script>
+      const { PythonShell } = require('python-shell')
+      const { ipcRenderer } = require('electron')
+      const path = require('path')
 
-  ipcRenderer.on('START_PROCESSING', (event, args) => {
-    let options = {
-      pythonPath: '/home/vaibhav/.anaconda/bin/python',
-      pythonOptions: ['-u'], // get print results in real-time
-      scriptPath: `${__dirname}/../scripts/`
-    }
+      ipcRenderer.on('START_PROCESSING', (event, args) => {
+        let options = {
+          pythonPath: '/home/vaibhav/.anaconda/bin/python',
+          pythonOptions: ['-u'], // get print results in real-time
+          scriptPath: `${__dirname}/../scripts/`
+        }
 
-    let pyshell = new PythonShell('detect_blink.py', options)
+        let pyshell = new PythonShell('detect_blink.py', options)
 
-    //ipcRenderer.send('MESSAGE_FROM_BACKGROUND', { message: pyshell })
+        pyshell.on('message', function(results) {
+          ipcRenderer.send('MESSAGE_FROM_BACKGROUND', { message: results })
+        })
 
-    pyshell.on('message', function(results) {
-      ipcRenderer.send('MESSAGE_FROM_BACKGROUND', { message: results })
-    })
+        pyshell.on('close', () => {
+          ipcRenderer.send('STOP_HIDDEN')
+        })
+      })
 
-    pyshell.on('close', () => {
-      ipcRenderer.send('STOP_HIDDEN')
-    })
-  })
-
-  ipcRenderer.send('BACKGROUND_READY')
-</script>
+      ipcRenderer.send('BACKGROUND_READY')
+    </script>
+  </body>
+</html>
