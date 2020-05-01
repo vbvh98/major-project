@@ -96,8 +96,6 @@ while True:
 
         if not blinked and ear < EYE_AR_THRESH:
             COUNTER += 1
-            if COUNTER == 1:
-                start = datetime.now()
             if COUNTER == 2:
                 blinkstart = True
             else:
