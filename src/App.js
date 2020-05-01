@@ -1,7 +1,7 @@
-import React, { useState, useReducer, useCallback } from 'react'
+import React, { useReducer, useCallback } from 'react'
 import AlphabetLayout from './components/AlphabetLayout'
-import Modal from './components/Modal'
-import { useBlinkDetector } from './hooks/useBlinkDetector'
+// import Modal from './components/Modal'
+import useBlinkDetector from './hooks/useBlinkDetector'
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -18,15 +18,7 @@ const reducer = (state, action) => {
 
 const App = () => {
   const [state, disptach] = useReducer(reducer, { text: '' })
-  const [display, setDisplay] = useState(false)
-  const data = useBlinkDetector()
-
-  const updateDisplayModal = useCallback(
-    val => {
-      setDisplay(val)
-    },
-    [setDisplay]
-  )
+  const [data, startBlinkDetection, stopBlinkDetection] = useBlinkDetector()
 
   const updateText = useCallback(
     (type, payload) => {
@@ -44,9 +36,10 @@ const App = () => {
       <AlphabetLayout
         data={data}
         updateText={updateText}
-        updateDisplayModal={updateDisplayModal}
+        startBlinkDetection={startBlinkDetection}
+        stopBlinkDetection={stopBlinkDetection}
       />
-      <Modal data={data} display={display} />
+      {/* <Modal data={data} display={display} /> */}
     </div>
   )
 }

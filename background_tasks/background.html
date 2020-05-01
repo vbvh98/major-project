@@ -9,7 +9,7 @@
 
       ipcRenderer.on('START_PROCESSING', (event, args) => {
         let options = {
-          pythonPath: '/home/vaibhav/.anaconda/bin/python',
+          pythonPath: '/usr/bin/python3',
           pythonOptions: ['-u'], // get print results in real-time
           scriptPath: `${__dirname}/../scripts/`
         }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { DEFAULT_BLINK_LAYOUT } from '../../blink-layout.json'
 import useInterval from '../../hooks/useTimer'
 
-const AlphabetLayout = ({ data, updateText, updateDisplayModal }) => {
+const AlphabetLayout = ({ data, updateText, startBlinkDetection, stopBlinkDetection }) => {
   const [layout] = useState(DEFAULT_BLINK_LAYOUT)
   const [indexMap] = useState([6, 5, 6, 5])
   const [size] = useState(indexMap.length - 1)
@@ -26,10 +26,15 @@ const AlphabetLayout = ({ data, updateText, updateDisplayModal }) => {
     setRowIdx(0)
     setRunRow(true)
   }
+  useEffect(() => {
+    startBlinkDetection()
+    return () => stopBlinkDetection()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useInterval(nextRowIdx, start && runRow ? 1400 : null)
   useInterval(nextColIdx, start && !runRow ? 1400 : null)
-
+  
   useEffect(() => {
     console.log(data)
     if (data.type === 'BLINK')
@@ -48,14 +53,16 @@ const AlphabetLayout = ({ data, updateText, updateDisplayModal }) => {
         updateText('DEL')
         reset()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
   return (
     <div className='layout cool-shadow'>
       {layout.map((row, ridx) => (
-        <div className={`letter-row ${ridx === rowIdx && 'cool-shadow'}`}>
+        <div key={ridx} className={`letter-row ${ridx === rowIdx && 'cool-shadow'}`}>
           {row.map((cell, cidx) => (
             <div
+              key={cidx}
               className={`letter ${!runRow &&
                 ridx === rowIdx &&
                 cidx === colIdx &&
