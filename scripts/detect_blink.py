@@ -62,7 +62,6 @@ vs = VideoStream(src=0).start()
 
 fileStream = False
 time.sleep(1.0)
-start = datetime.now()
 
 while True:
     time.sleep(0.04)
@@ -72,7 +71,7 @@ while True:
     frame = vs.read()
 
     frame = cv2.flip(frame, 1)
-    frame = imutils.resize(frame, width=450)
+    frame = imutils.resize(frame, width=400)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     rects = detector(gray, 0)
@@ -103,26 +102,20 @@ while True:
             if COUNTER >= EYE_AR_CONSEC_FRAMES_L:
                 blinked = True
                 beep()
-                e = datetime.now() - start
-                # log(f'{e.seconds}:{e.microseconds}')
                 log(json.dumps({"type": "BLINK", "msg": "L"}))
             elif not blinked_m and COUNTER >= EYE_AR_CONSEC_FRAMES_M:
                 blinked_m = True
                 beep()
-                e = datetime.now() - start
-                # log(f'{e.seconds}:{e.microseconds}')
                 log(json.dumps({"type": "BLINK", "msg": "M"}))
             elif not blinked_s and COUNTER >= EYE_AR_CONSEC_FRAMES_S:
                 blinked_s = True
                 beep()
-                e = datetime.now() - start
-                # log(f'{e.seconds}:{e.microseconds}')
                 log(json.dumps({"type": "BLINK", "msg": "S"}))
 
         else:
             blinkstart, blinked, blinked_m, blinked_s = False, False, False, False
             COUNTER = 0
-        cv2.putText(frame, "EAR: {:.2f}".format(ear), (300, 30),
+        cv2.putText(frame, "EAR: {:.2f}".format(ear), (260, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
     cv2.imshow("Frame", frame)
